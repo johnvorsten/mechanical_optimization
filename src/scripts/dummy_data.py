@@ -7,6 +7,7 @@ Create B-splines which represent dummy equipment operating curves
 # Third party imports
 from scipy.interpolate import LinearNDInterpolator, RBFInterpolator
 import numpy as np
+from matplotlib import pyplot as plt
 
 # Local imports
 
@@ -20,6 +21,7 @@ data_points = np.array([ # condenser water temperature, power input, capacity ou
     ], dtype=np.float32)
 independent_data = data_points[:,[0,2]]
 target = data_points[:,1]
+interpolator = RBFInterpolator(independent_data, target, smoothing=1, kernel='thin_plate_spline')
 
 # File import
 DUMMY_DATA_FILEPATH = '../../data/dummy_data.csv'
@@ -29,7 +31,13 @@ chiller_2_data = DUMMY_DATA[:, [1,3,6]]
 chiller_3_data = DUMMY_DATA[:, [1,4,7]]
 
 #%%
-
+xs = np.linspace(start=9, stop=60, num=50)
+ys = interpolator(np.concatenate(
+            arrays=(np.array([35]*50, dtype=np.float32), xs))
+            )
+fig, ax = plt.subplots()
+ax.scatter(xs, ys)
+plt.show()
 
 
 # %%
