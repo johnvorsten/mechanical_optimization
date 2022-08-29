@@ -18,13 +18,21 @@ Note: It is possible to further optimize the total efficiency of a chiller plant
 
 Some equipment has the capability to vary capacity from minimum to rated maximum.  Chillers operate at different efficiencies when output load is varied up to its maximum capacity. Generally, chillers are least efficient when at minimum rated capacity, and most efficient somewhere less than full capacity. This implies there is a global maximum efficiency that is neither at the minimum or maximum capacity.
 
+* Return and supply evaporator water temperature
+
+Higher return evaporator water temperature can have a positive effect on water to refrigerant heat transfer, and possibly increase efficiency. Generally, higher supply water temperature (not too high!) also increases heat transfer efficiency. 
+
 ## How can someone choose to operate at the most efficient capacity?
 By measuring cooling capacity output and electric power input across all operating inputs it is possible to know where equipment operates most efficiently. Once the most efficient operating point is known, and given a set of independent variable inputs, it is possible to choose the number of chillers, and output capacity of each chiller, which produces equal to or greater than the desired cooling capacity while minimizing electric power consumed.
 
 Independent variables:
 * Cooling load (power) required [kW]
 * Condenser water temperature [DEG C]
+* Condenser water flow rate
 * Number of operable chillers [integer]
+* Evaporator return water temperature
+* Evaporator supply water temperature (setpoint)
+* Evaporator water flow rate
 
 Output:
 * Number of chillers to enable
