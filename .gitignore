@@ -1,3 +1,4 @@
 Trane Chiller operation and efficiency.pdf
 venv/**
 data/dummy_data.ods
+src/scripts/temp.py

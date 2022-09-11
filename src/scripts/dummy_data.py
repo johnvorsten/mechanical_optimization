@@ -120,7 +120,7 @@ MAXIMUM_COOLING_OUTPUT = 49.2
 """
 Interpolation (line must go through given points) of capacity output versus power input
 """
-xs = np.linspace(start=9, stop=60, num=50)
+xs = np.linspace(start=MINIMUM_COOLING_OUTPUT, stop=MAXIMUM_COOLING_OUTPUT, num=50)
 ys = interpolator(np.stack(
             (np.array([35]*50, dtype=np.float32), xs), axis=1)
             )
@@ -131,8 +131,8 @@ ax.scatter(xs, ys)
 ax_efficiency.plot(xs, efficiency, c='red', label='efficiency')
 ax.axvline(x=MINIMUM_COOLING_OUTPUT, dashes=(5,5))
 ax.axvline(x=MAXIMUM_COOLING_OUTPUT, dashes=(5,5))
-ax.text(x=MINIMUM_COOLING_OUTPUT, y=35, s='minimum\ncapacity')
-ax.text(x=MAXIMUM_COOLING_OUTPUT, y=35, s='maximum\ncapacity')
+ax.text(x=MINIMUM_COOLING_OUTPUT, y=15, s='minimum\ncapacity')
+ax.text(x=MAXIMUM_COOLING_OUTPUT, y=15, s='maximum\ncapacity')
 ax.set_xlabel('Capacity output (kW of cooling)')
 ax.set_ylabel('Electric power input (kW)')
 ax_efficiency.set_ylabel('Efficiency [kWA/kW]')
@@ -151,7 +151,7 @@ def random_noise_standard_normal(min:float, max:float) -> float:
 
 pipeline = Pipeline(
     [
-    ('polynomial', PolynomialFeatures(degree=4)),
+    ('polynomial', PolynomialFeatures(degree=3)),
     ('scaler', StandardScaler()),
     ]
 )
@@ -171,12 +171,14 @@ y = dependent_data
 linear_regressor_power_input.fit(X, y)
 
 """Linear regression of power input and cooling power output"""
-x_scale = np.linspace(start=9, stop=60, num=N_SAMPLES).reshape(-1,1) # Cooling power output [kW]
+x_scale = np.linspace(start=MINIMUM_COOLING_OUTPUT, stop=MAXIMUM_COOLING_OUTPUT, num=N_SAMPLES).reshape(-1,1) # Cooling power output [kW]
+x_scale_2 = np.linspace(start=9, stop=60, num=N_SAMPLES).reshape(-1,1)
 y_hat = linear_regressor_power_input.predict(pipeline.fit_transform(x_scale)) # Predicted power input (N_SAMPLES, 1) [kW]
 efficiency = np.divide(x_scale.reshape(-1), y_hat)
 fig, ax = plt.subplots()
 ax_efficiency = ax.twinx()
 ax.scatter(x_scale, y_hat)
+ax.scatter(desired_capacity, y)
 ax_efficiency.plot(x_scale, efficiency, c='red', label='efficiency')
 ax.axvline(x=MINIMUM_COOLING_OUTPUT, dashes=(5,5))
 ax.axvline(x=MAXIMUM_COOLING_OUTPUT, dashes=(5,5))
@@ -188,7 +190,6 @@ ax_efficiency.set_ylabel('Efficiency [kWA/kW]')
 ax.set_title('Linear regression of cooling capacity output ')
 ax_efficiency.legend(loc='lower center')
 plt.show()
-
 
 #%%
 
@@ -294,13 +295,13 @@ assert all(scaled_power_input[0,:,5] == baseline_power_input.reshape(-1)) # This
 
 # Generate data for other values around the default value with noise
 def condenser_water_temperature_random() -> float:
-    val = random_noise_standard_normal(min=DEFAULT_CONDENSER_WATER_FLOW_RATE-0.025, max=DEFAULT_CONDENSER_WATER_FLOW_RATE+0.025)
+    val = random_noise_standard_normal(min=DEFAULT_CONDENSER_WATER_TEMPERATURE-1, max=DEFAULT_CONDENSER_WATER_TEMPERATURE+1)
     return val
 def condenser_water_flow_rate_random() -> float:
     val = random_noise_standard_normal(min=DEFAULT_CONDENSER_WATER_FLOW_RATE-0.025, max=DEFAULT_CONDENSER_WATER_FLOW_RATE+0.025)
     return val
 def evaporator_return_water_temperature_random() -> float:
-    val = random_noise_standard_normal(min=DEFAULT_EVAPORATOR_RETURN_WATER_TEMPERATURE-1, max=DEFAULT_EVAPORATOR_RETURN_WATER_TEMPERATURE+1)
+    val = random_noise_standard_normal(min=DEFAULT_EVAPORATOR_RETURN_WATER_TEMPERATURE-0.5, max=DEFAULT_EVAPORATOR_RETURN_WATER_TEMPERATURE+0.5)
     return val
 def evaporator_supply_water_temperature_random() -> float:
     val = random_noise_standard_normal(min=DEFAULT_EVAPORATOR_SUPPLY_WATER_TEMPERATURE-0.15, max=DEFAULT_EVAPORATOR_SUPPLY_WATER_TEMPERATURE+0.15)
