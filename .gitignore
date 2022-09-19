@@ -2,3 +2,6 @@ Trane Chiller operation and efficiency.pdf
 venv/**
 data/dummy_data.ods
 src/scripts/temp.py
+src/chiller_optimization/programming_flowchart.drawio
+data/generated_dummy_data.csv
+**/__pycache__

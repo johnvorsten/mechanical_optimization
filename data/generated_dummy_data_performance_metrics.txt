@@ -1,0 +1,25 @@
+Linear model cross validation results:
+fit_time [0.02656031 0.02208281 0.02193856]
+score_time [0.00053501 0.00199628 0.00099802]
+test_explained_variance [0.99948621 0.99949121 0.99948752]
+test_max_error [-0.94442558 -0.98877907 -1.13363457]
+test_neg_mean_squared_error [-0.02073113 -0.01874441 -0.01972462]
+
+Ridge model cross validation results:
+fit_time [0.04687428 0.00997305 0.00687551]
+score_time [0.00199509 0.00099659 0.00199628]
+test_explained_variance [0.99926323 0.99927497 0.99929225]
+test_max_error [-1.21450806 -1.03977013 -1.13262177]
+test_neg_mean_squared_error [-0.02973851 -0.0267124  -0.02722594]
+
+Linear model test validation results:
+explained_variance 0.9995203614234924
+mean_absolute 0.09193417
+mean_squared 0.018882528
+max_error 1.1508389
+
+Ridge model test validation results:
+explained_variance 0.9993792176246643
+mean_absolute 0.10991057
+mean_squared 0.024459438
+max_error 1.2230473
