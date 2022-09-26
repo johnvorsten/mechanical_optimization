@@ -18,11 +18,9 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 
 # Local imports
+from . import parser
 
 # Declarations
-CONFIG_FILEPATH = './config.ini'
-parser = ConfigParser()
-parser.read(CONFIG_FILEPATH)
 DEGREE: int = int(parser['pipeline']['degree_of_polynomial_features'])
 
 #%%

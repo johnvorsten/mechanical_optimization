@@ -40,14 +40,14 @@ TARGET_INDEX: List[int] = REQUIRED_FILE_HEADERS.index('power_input [kW]')
 
 #%%
 
-def load_training_data_csv(filepath: str, headers:List[str]) -> np.ndarray:
+def load_training_data_csv(filepath: str, required_headers:List[str]) -> np.ndarray:
     """Read .csv file to list of tuples"""
     rows: List[float] = []
 
     with open(filepath, 'rt', encoding='UTF-8') as csvfile:
         reader = csv.reader(csvfile)
         headers: List[str] = next(reader)
-        if not set(headers).issubset(set(REQUIRED_FILE_HEADERS)):
+        if not set(required_headers).issubset(set(REQUIRED_FILE_HEADERS)):
             msg=f'Improperly named .csv headers. Expected {REQUIRED_FILE_HEADERS}. Got {headers}'
             raise ValueError(msg)
 
