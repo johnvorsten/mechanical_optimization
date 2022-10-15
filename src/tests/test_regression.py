@@ -107,18 +107,23 @@ class RegressionTest(unittest.TestCase):
         self.assertIsInstance(parts[0], str)
         return None
 
+    def test_save_model_pickled(self):
+        raise NotImplementedError
+        return None
+
+    def test_load_model_pickled(self):
+        raise NotImplementedError
+        return None
+
     def test_(self):
         return None
+
     def test_(self):
         return None
+
     def test_(self):
         return None
-    def test_(self):
-        return None
-    def test_(self):
-        return None
-    def test_(self):
-        return None
+
     def test_(self):
         return None
     
