@@ -36,17 +36,16 @@ TARGET_HEADER_NAME = 'power_input [kW]'
 
 # Saving a model
 MODEL_BASE_FILENAME: str = '{customer_id}_{model_description}_{datetime}'
-MODEL_TYPE = [
+MODEL_TYPE: Dict[str,str] = {
     str(type(LinearRegression())): 'linear_regression',
     str(type(Ridge())): 'ridge_regression',
     str(type(SGDRegressor())): 'SGD_regression',
-]
+}
 LINEAR_PARAMETERS_BASE_FILENAME = '{customer_id}_linear_parameters_{datetime}'
-DATETIME_FORMAT = "%Y-%m-%dT%HH:MM:SS"
+DATETIME_FORMAT = "%Y-%m-%dT%H-%M-%S"
 
 #%%
 
-# Load a model
 def load_model_parameters(customer_id: str) -> Union[LinearRegression, Ridge]:
     """TODO - deferred because this function isn't planned to be needed yet
     Load a saved model based on the customer ID
@@ -54,8 +53,22 @@ def load_model_parameters(customer_id: str) -> Union[LinearRegression, Ridge]:
     when a customer requests a prediction. 
     An alternative to returning an pickled model is to load the 
     weights associated with a model and initialize the model with
-    the trained weights... unkonwn what to do right now"""
+    the trained weights... unknown what to do right now"""
+    raise NotImplementedError
     return None
+
+def save_model_parameters(
+    customer_id: str,
+    save_directory: str,
+    model: Union[LinearRegression, Ridge, SGDRegressor]) -> str:
+    """Save a models parameters, but not the entire model"""
+    model_filename: str = determine_model_file_name(customer_id, model)
+    model_filepath: str = os.path.join(save_directory, model_filename)
+
+    # TODO
+    # Currently, I do not see a benefit of saving model parameters separately.
+    # I do not plan on implementing this right now
+    raise NotImplementedError
 
 def load_model_pickled(
     customer_id: str,
@@ -68,27 +81,42 @@ def load_model_pickled(
     then load the model"""
 
     model: Any
-    # TODO
     # Determine the most recent saved model
     model_path_match: str = os.path.join(save_directory, customer_id)
-    models = glob(model_path_match)
-    model_filepath = models.sort(key=lambda date: datetime.strptime(date, DATETIME_FORMAT))
-    # Determine the type of the most recently saved model
-    
+    models = glob(model_path_match + '*')
+    _sort_strings_on_date_format(models)
     # Read the disc file to memory
-
-    # Load the memory into a representation of a model (most likely scikit learn)
-
+    with open(models[0]) as model_file:
+        model = pickle.load(model_file)
     return model
 
-def _sort_strings_on_date_format(string: str) -> List[str]:
+# Save a model
+def save_model_pickled(
+        customer_id: str, 
+        save_directory: str, 
+        model: Union[LinearRegression, Ridge, SGDRegressor]) -> str:
+    """Save a trained model associated with a customer"""
+    model_filename: str = determine_model_file_name(customer_id, model)
+    model_filepath: str = os.path.join(save_directory, model_filename)
+
+    with open(model_filepath, 'wb') as file:
+        pickle.dump(model, file)
+
+    return model_filepath
+
+
+
+
+def _sort_strings_on_date_format(string_list: List[str]) -> None:
     """Return a sorted list of strings in descending order, with the sorting
     function using a datetime string representation"""
+    string_list.sort(key = lambda x: datetime.strptime(x[-19:], DATETIME_FORMAT))
+    return None
 
 def determine_model_file_name(
-    customer_id: Union[str, UUID], 
+    customer_id: str, 
     model: Union[LinearRegression, Ridge, SGDRegressor]) -> str:
-    """Save a model in a specificed location with a specified file name"""
+    """Save a model in a specified location with a specified file name"""
     if isinstance(model, ABCMeta):
         msg="Model is not initialized. Got {}, expected {}".format(type(model), type(LinearRegression()))
         raise ValueError(msg)
@@ -105,8 +133,8 @@ def determine_model_file_name(
     return model_file_name
 
 def determine_linear_model_parameters_file_name(
-    customer_id: int) -> str:
-    """Save parameters related to a model in a specificed location with a specified file name
+    customer_id: str) -> str:
+    """Save parameters related to a model in a specified location with a specified file name
     This will ONLY determine the file name for linear model parameters. The whole model is
     not saved, only the weights and bias"""
     if not isinstance(customer_id, int):
@@ -120,34 +148,5 @@ def determine_linear_model_parameters_file_name(
         datetime=datetime_str,
     )
     return parameters_file_name
-
-# Save a model
-def save_model_pickled(
-        customer_id: int, 
-        save_directory: str, 
-        model: Union[LinearRegression, Ridge, SGDRegressor]) -> str:
-    """Save a trained model associated with a customer"""
-    model_filename: str = determine_model_file_name(customer_id, model)
-    model_filepath: str = os.path.join(save_directory, model_filename)
-
-    with open(model_filepath, 'wb') as file:
-        pickle.dump(model)
-
-    return model_filepath
-
-# Save a models parameters, but not the entire model
-
-def save_model_parameters(
-    customer_id: int,
-    save_directory: str,
-    model: Union[LinearRegression, Ridge, SGDRegressor]) -> str:
-    
-    model_filename: str = determine_model_file_name(customer_id, model)
-    model_filepath: str = os.path.join(save_directory, model_filename)
-
-    # TODO
-    # Currently, I do not see a benefit of saving model parameters separately.
-    # I do not plan on implementing this right now
-    raise NotImplementedError
 
 

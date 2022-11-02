@@ -36,7 +36,7 @@ TARGET_HEADER_NAME = 'power_input [kW]'
 #%%
 
 # Load data
-data = load_training_data_csv(DATA_FILEPATH, headers=REQUIRED_FILE_HEADERS)
+data = load_training_data_csv(DATA_FILEPATH, required_headers=REQUIRED_FILE_HEADERS)
 features_headers: List[str] = deepcopy(REQUIRED_FILE_HEADERS)
 features_headers.remove('power_input [kW]')
 features_index: List[int] = list(range(len(REQUIRED_FILE_HEADERS)))
@@ -73,8 +73,8 @@ linear_model.fit(x_train, y_train)
 ridge_model.fit(x_train, y_train)
 y_pred_linear_test = linear_model.predict(x_test)
 y_pred_ridge_test = ridge_model.predict(x_test)
-results_linear: Dict[str, int] = {}
-results_ridge: Dict[str, int] = {}
+results_linear: Dict[str, float] = {}
+results_ridge: Dict[str, float] = {}
 results_linear['explained_variance'] = explained_variance_score(y_test, y_pred_linear_test)
 results_linear['mean_absolute'] = mean_absolute_error(y_test, y_pred_linear_test)
 results_linear['mean_squared'] = mean_squared_error(y_test, y_pred_linear_test)
@@ -92,7 +92,7 @@ for key, value in results_ridge.items():
     print(key, value)
 
 #%%
-# Visualiation of performance metrics
+# Visualization of performance metrics
 # Minimum capacity output (9.84kW) condenser water temperature ranges 20-35 DEG C
 DATA_START = 0 # 0-indexed row from .csv file
 DATA_END = 50 # closed end
