@@ -17,12 +17,14 @@ number of features expected
 
 # Python imports
 import csv
-from typing import List
+from typing import List, Tuple
+from copy import deepcopy
 
 # Third party imports
 import numpy as np
 
 # Local imports
+from chiller_optimization.regression import LINEAR_INPUT_SPECIFICATION
 
 # Declaration
 REQUIRED_FILE_HEADERS: List[str] = [
@@ -36,7 +38,7 @@ REQUIRED_FILE_HEADERS: List[str] = [
     ]
 FEATURE_INDEX: List[int] = list(range(len(REQUIRED_FILE_HEADERS))).remove(REQUIRED_FILE_HEADERS.index('power_input [kW]'))
 TARGET_INDEX: List[int] = REQUIRED_FILE_HEADERS.index('power_input [kW]')
-
+DUMMY_DATA_FILEPATH = '../data/generated_dummy_data2022-9-11.csv' # Relative to module
 
 #%%
 
@@ -55,5 +57,23 @@ def load_training_data_csv(filepath: str, required_headers:List[str]) -> np.ndar
             rows.append(row)
 
     return np.array(rows, dtype=np.float32)
+
+def load_dummy_data() -> Tuple[np.ndarray, np.ndarray, List[str]]:
+    """Returns a tuple of (features: np.ndarray, target, feature names) related to the 
+    dummy dataset included with this package"""
+
+    data = load_training_data_csv(DUMMY_DATA_FILEPATH, required_headers=REQUIRED_FILE_HEADERS)
+    features_headers: List[str] = deepcopy(REQUIRED_FILE_HEADERS)
+    features_headers.remove('power_input [kW]')
+    features_index: List[int] = list(range(len(REQUIRED_FILE_HEADERS)))
+    features_index.remove(REQUIRED_FILE_HEADERS.index('power_input [kW]'))
+    features = data[:,features_index]
+    target_index = REQUIRED_FILE_HEADERS.index('power_input [kW]')
+    target = data[:, target_index]
+
+    data = (features, target, features_headers)
+
+    return data
+
 
 #%%

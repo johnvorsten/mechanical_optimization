@@ -18,7 +18,8 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 
 # Local imports
-from . import parser
+from chiller_optimization import parser
+from data_load import load_dummy_data
 
 # Declarations
 DEGREE: int = int(parser['pipeline']['degree_of_polynomial_features'])
@@ -31,3 +32,7 @@ linear_regression_pipeline = Pipeline(
     ('scaler', StandardScaler()),
     ]
 )
+features, target, feature_names = load_dummy_data()
+linear_regression_pipeline.fit(features)
+
+# %%

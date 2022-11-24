@@ -8,7 +8,7 @@ customer ID, description of the model, and time stamp"""
 
 # Python imports
 from configparser import ConfigParser
-from typing import Union, Any, List, Dict
+from typing import Union, Any, List, Dict, Tuple
 from datetime import datetime, timezone
 import time
 import pickle
@@ -24,14 +24,12 @@ from sklearn.linear_model import LinearRegression, Ridge, SGDRegressor
 import numpy as np
 
 # Local imports
-from .pipeline import linear_regression_pipeline
-from .data_load import load_training_data_csv, REQUIRED_FILE_HEADERS
-from . import parser
+from chiller_optimization.pipeline import linear_regression_pipeline
+from chiller_optimization import parser
 
 # Declaration
 DEGREE: int = int(parser['pipeline']['degree_of_polynomial_features'])
 ALPHA: float = float(parser['hyperparameters']['ridge_alpha'])
-DATA_FILEPATH = '../../data/generated_dummy_data2022-9-11.csv'
 TARGET_HEADER_NAME = 'power_input [kW]'
 
 # Saving a model
@@ -43,6 +41,16 @@ MODEL_TYPE: Dict[str,str] = {
 }
 LINEAR_PARAMETERS_BASE_FILENAME = '{customer_id}_linear_parameters_{datetime}'
 DATETIME_FORMAT = "%Y-%m-%dT%H-%M-%S"
+
+# Linear model input data specification
+LINEAR_INPUT_SPECIFICATION: List[Tuple[str, float]] = [
+    ('capacity_output [kW]', float),
+    ('condenser_water_temperature [DEG C]', float),
+    ('condenser_water_flow_rate [percent]', float),
+    ('evaporator_water_return_temperature [DEG C]', float),
+    ('evaporator_water_supply_temperature [DEG C]', float),
+    ('evaporator_water_flow_rate [percent]', float),
+    ]
 
 #%%
 
@@ -85,8 +93,12 @@ def load_model_pickled(
     model_path_match: str = os.path.join(save_directory, customer_id)
     models = glob(model_path_match + '*')
     _sort_strings_on_date_format(models)
+    if len(models) == 0:
+        msg=('The directory does not contain any files with ' +
+             'names matching the desired path match string {model_path_match}')
+        raise OSError(msg)
     # Read the disc file to memory
-    with open(models[0]) as model_file:
+    with open(models[0], 'rb') as model_file:
         model = pickle.load(model_file)
     return model
 
@@ -103,9 +115,6 @@ def save_model_pickled(
         pickle.dump(model, file)
 
     return model_filepath
-
-
-
 
 def _sort_strings_on_date_format(string_list: List[str]) -> None:
     """Return a sorted list of strings in descending order, with the sorting
@@ -149,4 +158,6 @@ def determine_linear_model_parameters_file_name(
     )
     return parameters_file_name
 
-
+def load_features_specification():
+    """Return the input data type specification for predicting on linear models"""
+    return LINEAR_INPUT_SPECIFICATION

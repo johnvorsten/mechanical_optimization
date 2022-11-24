@@ -21,15 +21,17 @@ from matplotlib import pyplot as plt
 from sklearn.metrics import (explained_variance_score, mean_absolute_error, mean_squared_error, max_error)
 
 # Local imports
-from pipeline import linear_regression_pipeline
-from data_load import load_training_data_csv, REQUIRED_FILE_HEADERS
+from chiller_optimization.pipeline import linear_regression_pipeline
+from chiller_optimization.data_load import load_training_data_csv, REQUIRED_FILE_HEADERS
+from chiller_optimization.regression import save_model_pickled
+from chiller_optimization import parser
 
 # Declaration
-parser = ConfigParser()
-parser.read('./config.ini')
+# parser = ConfigParser()
+# parser.read('./config.ini')
 DEGREE: int = int(parser['pipeline']['degree_of_polynomial_features'])
 ALPHA: float = float(parser['hyperparameters']['ridge_alpha'])
-DATA_FILEPATH = '../../data/generated_dummy_data2022-9-11.csv'
+DATA_FILEPATH = '../data/generated_dummy_data2022-9-11.csv' # relative to parent package
 TARGET_HEADER_NAME = 'power_input [kW]'
 
 
@@ -130,9 +132,13 @@ y_true = target[DATA_INDEX]
 fix, ax = plt.subplots()
 ax.scatter(capacity_output, y_true, label='target data')
 ax.scatter(capacity_output, y_pred, label='predicted')
-ax.set_xlabel('Condenser water flow rate [%]')
+ax.set_xlabel('Capacity output [kW]')
 ax.set_ylabel('Power input [kW]')
-ax.set_title('Predicted power input at minimum cooling output\nvarying condenser water flow rate')
+ax.set_title('Predicted power input at minimum cooling output\nvarying capacity output')
 ax.legend()
+
+# %% Save models
+
+save_model_pickled(customer_id='testing', save_directory='../data/', model=linear_model)
 
 # %%

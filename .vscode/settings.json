@@ -2,5 +2,6 @@
     "cSpell.words": [
         "sklearn"
     ],
-    "python.analysis.typeCheckingMode": "off"
+    "python.analysis.typeCheckingMode": "off",
+    "jupyter.notebookFileRoot": "${workspaceFolder}\\src"
 }
