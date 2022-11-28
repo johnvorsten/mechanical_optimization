@@ -42,15 +42,6 @@ MODEL_TYPE: Dict[str,str] = {
 LINEAR_PARAMETERS_BASE_FILENAME = '{customer_id}_linear_parameters_{datetime}'
 DATETIME_FORMAT = "%Y-%m-%dT%H-%M-%S"
 
-# Linear model input data specification
-LINEAR_INPUT_SPECIFICATION: List[Tuple[str, float]] = [
-    ('capacity_output [kW]', float),
-    ('condenser_water_temperature [DEG C]', float),
-    ('condenser_water_flow_rate [percent]', float),
-    ('evaporator_water_return_temperature [DEG C]', float),
-    ('evaporator_water_supply_temperature [DEG C]', float),
-    ('evaporator_water_flow_rate [percent]', float),
-    ]
 
 #%%
 
@@ -116,6 +107,42 @@ def save_model_pickled(
 
     return model_filepath
 
+def delete_model_pickled(customer_id: str, save_directory: str, model_created_when: str) -> str:
+    """Delete either the most recent model (newest), or the oldest model
+    inputs
+    -------
+    customer_id: unique ID related to customer
+    save_directory: (str) directory wehere model is saved
+    model_created_when: (str) one of ['oldest', 'newest']
+    """
+    model: Any
+    # Final all model filepaths related to a specific customer
+    model_path_match: str = os.path.join(save_directory, customer_id)
+    models = glob(model_path_match + '*')
+    _sort_strings_on_date_format(models) # descending
+    if len(models) == 0:
+        msg=('The directory does not contain any files with ' +
+             'names matching the desired path match string {model_path_match}')
+        raise OSError(msg)
+    
+    # Determine which model to look at
+    if len(models) == 1:
+        msg=("There is only one model currently saved. No models will be deleted " +
+        "if there is only one model available.")
+
+    if model_created_when == 'newest':
+        model_filepath = model[0]
+    elif model_created_when == 'oldest':
+        model_filepath = model[-1]
+    else:
+        msg=('Incorrect value of model_created_when. Must be one of {"newest", "oldest"}')
+        raise ValueError(msg)
+
+    # Delete model from disc
+    os.remove(model_filepath)
+
+    return model_filepath
+
 def _sort_strings_on_date_format(string_list: List[str]) -> None:
     """Return a sorted list of strings in descending order, with the sorting
     function using a datetime string representation"""
@@ -158,6 +185,3 @@ def determine_linear_model_parameters_file_name(
     )
     return parameters_file_name
 
-def load_features_specification():
-    """Return the input data type specification for predicting on linear models"""
-    return LINEAR_INPUT_SPECIFICATION

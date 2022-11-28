@@ -6,3 +6,4 @@ src/chiller_optimization/programming_flowchart.drawio
 data/generated_dummy_data.csv
 **/__pycache__
 *.pyc
+**testing_linear_regression*

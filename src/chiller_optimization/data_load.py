@@ -24,7 +24,6 @@ from copy import deepcopy
 import numpy as np
 
 # Local imports
-from chiller_optimization.regression import LINEAR_INPUT_SPECIFICATION
 
 # Declaration
 REQUIRED_FILE_HEADERS: List[str] = [
@@ -39,6 +38,16 @@ REQUIRED_FILE_HEADERS: List[str] = [
 FEATURE_INDEX: List[int] = list(range(len(REQUIRED_FILE_HEADERS))).remove(REQUIRED_FILE_HEADERS.index('power_input [kW]'))
 TARGET_INDEX: List[int] = REQUIRED_FILE_HEADERS.index('power_input [kW]')
 DUMMY_DATA_FILEPATH = '../data/generated_dummy_data2022-9-11.csv' # Relative to module
+
+# Linear model input data specification
+LINEAR_INPUT_SPECIFICATION: List[Tuple[str, float]] = [
+    ('capacity_output [kW]', float),
+    ('condenser_water_temperature [DEG C]', float),
+    ('condenser_water_flow_rate [percent]', float),
+    ('evaporator_water_return_temperature [DEG C]', float),
+    ('evaporator_water_supply_temperature [DEG C]', float),
+    ('evaporator_water_flow_rate [percent]', float),
+    ]
 
 #%%
 
@@ -75,5 +84,8 @@ def load_dummy_data() -> Tuple[np.ndarray, np.ndarray, List[str]]:
 
     return data
 
+def load_features_specification():
+    """Return the input data type specification for predicting on linear models"""
+    return LINEAR_INPUT_SPECIFICATION
 
 #%%
